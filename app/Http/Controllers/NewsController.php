@@ -79,26 +79,6 @@ $uploadedFileUrl = cloudinary()->upload($request->file('photo')->getRealPath(),[
     newsList::where('no',$id)->update($updatedData);
     return redirect()->route('main')->with(['update'=>'Data is updated!']);
    }
-//     $oldData = newsList::where('no',$id)->first();
-//
-//    if($request->hasFile('photo')){
-//         Cloudinary::destroy($oldData->photo);
-//         $uploaded  = cloudinary()->upload($request->file('file')->getRealPath(),
-//         ['folder'=>'news_images'])->getSecurePath();
-//     }else {
-//         $uploaded = $oldData->photo;
-//     }
-
-//    $data = newsList::where('no',$id)->update([
-//         'photo'=>$uploaded,
-//         'title'=>$request->title,
-//         'type'=>$request->type,
-//         'detail'=>$request->detail,
-//     ]);
-
-
-
-//   return redirect()->route('main')->with(['update'=>'Data is updated!']);
 
 
 
