@@ -17,107 +17,132 @@ class NewsController extends Controller
     }
 
     //create
-   public function create(Request $request){
-
-
-     return view('news.create');
-
-   }
-
-   //insert data
-   public function insert(Request $request){
-
-    // $validator = Validator::make($request->all(), [
-    //     'photo' => 'required',
-
-    //     'title'=>'required',
-    //     'type'=>'required',
-    //    'created_at'=>Carbon::now(),
-    //    'updated_at'=>Carbon::now(),
-    //  ]);
-
-    //  if ($validator->fails()) {
-    //      return back()
-    //                  ->withErrors($validator)
-    //                  ->withInput();
-    //  }
-
-$uploadedFileUrl = cloudinary()->upload($request->file('photo')->getRealPath(),['folder'=>'news_images'])->getSecurePath();
-
-
-   newsList::create([
-    'photo'=>$uploadedFileUrl,
-    'title'=>$request->title,
-    'type'=>$request->type,
-    'detail'=>$request->detail,
-   ]);
-
-
-
-  return redirect()->route('main')->with(['create'=>'Data is created!']);
-   }
-
-   //edit data
-   public function edit($id){
-
-   $data = newsList::where('no',$id)->first();
-   return view('news.edit')->with(['data'=>$data]);
-   }
-
-   //update data
-   public function update($id,Request $request){
-
-    $updatedData = $this->updatedData($request);
-    if($request->hasFile('photo')){
-        $data = newsList::select('photo')->where('no',$id)->first();
-       $oldPhoto = $data['photo'];
-       Cloudinary::destroy($oldPhoto);
-       $uploaded  = cloudinary()->upload($request->file('photo')->getRealPath(),
-        ['folder'=>'news_images'])->getSecurePath();
-
+    public function create(Request $request){
+return view('news.create');
     }
-    newsList::where('no',$id)->update($updatedData);
-    return redirect()->route('main')->with(['update'=>'Data is updated!']);
+
+
+   public function insert(Request $request){
+    $request->validate([
+        'photo' => 'required',
+        'title'=>'required',
+        'type'=>'required',
+         'detail'=>'required',
+        'created_at'=>Carbon::now(),
+        'updated_at'=>Carbon::now(),
+    ]);
+
+    $photo_id = $this->uploadPhoto($request);
+    $new =[
+        'title'=>$request->title,
+        'detail'=>$request->detail,
+        'type'=>$request->type,
+        'photo'=>$photo_id,
+    ];
+
+    $data = newsList::create($new);
+
+     return redirect()->route('main')->with(['data'=>$data]);
+
    }
 
-
-
-   //delete data
+   //delete
    public function delete($id){
-
-    $data = newsList::select('photo')->where('no',$id)->first();
-    $oldPhoto = $data['photo'];
+    $this->deletePhoto($id);
     newsList::where('no',$id)->delete();
-     Cloudinary::destroy([$oldPhoto]);
-
-    return redirect()->route('main')->with(['delete'=>'Data is deleted!']);
+    return redirect()->route('main');
    }
 
-   //choose important
+   //edit
+   public function edit($id){
+    $data = newsList::where('no',$id)->first();
+    return view('news.edit')->with(['data'=>$data]);
+   }
+
+   //update
+   public function update($id,Request $request){
+    $request->validate([
+        'photo' => 'required',
+        'title'=>'required',
+        'type'=>'required',
+         'detail'=>'required',
+        'created_at'=>Carbon::now(),
+        'updated_at'=>Carbon::now(),
+    ]);
+    if($request->hasFile('photo')){
+        $this->deletePhoto($id);
+        $photo_id = $this->uploadPhoto($request);
+    $new =[
+        'title'=>$request->title,
+        'detail'=>$request->detail,
+        'type'=>$request->type,
+        'photo'=>$photo_id,
+    ];
+newsList::where('no',$id)->update($new);
+    }
+
+    $new =[
+        'title'=>$request->title,
+        'detail'=>$request->detail,
+        'type'=>$request->type,
+    ];
+    $data = newsList::where('no',$id)->update($new);
+return redirect()->route('main');
+
+
+   }
+
+   //important
    public function important(){
     $data = newsList::where('type','1')->get();
     return view('news.main')->with(['data'=>$data]);
    }
 
-   //choose normal
+   //normal
    public function normal(){
-   $data = newsList::where('type','0')->get();
+    $data = newsList::where('type','0')->get();
     return view('news.main')->with(['data'=>$data]);
    }
 
-   private function updatedData($request){
-    $arr = [
-        'title'=>$request->title,
-        'type'=>$request->type,
-        'detail'=>$request->detail,
 
-    ];
-    if($request->hasFile('photo')){
-        $arr['photo']= $request->photo;
-            }
-            return $arr;
-
-   }
+//upload photo
+private function uploadPhoto($request){
+    $photo = $request->file('photo')->getClientOriginalName();
+    $result = $request->file('photo')->storeOnCloudinaryAs('news_images', rand().$photo);
+    $photo_id = $result->getPublicId();
+return $photo_id;
 
 
 }
+
+//delete photo
+private function deletePhoto($id){
+$public_id = newsList::where('no',$id)->first()->photo;
+Cloudinary::destroy($public_id);
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

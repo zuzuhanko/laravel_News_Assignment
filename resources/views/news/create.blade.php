@@ -30,12 +30,18 @@
 
     <textarea id="summernote" name="detail" ></textarea>
     <script>
-        $('#summernote').summernote({
 
-          placeholder: 'detail',
-          tabsize: 2,
-          height: 100
-        });
+
+$(document).ready(function() {
+        $('#summernote').summernote({
+        placeholder: 'Hello Bootstrap 4',
+        tabsize: 2,
+        height: 100
+      }).html('');
+    });
+
+
+
       </script>
 
 

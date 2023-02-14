@@ -64,7 +64,7 @@
                          <tbody>
                             <tr>
                                 <td>{{$item->no}}</td>
-                                <td><img width="100px;" src="{{$item->photo}}"></td>
+                                <td><img width="100px;" src="{{Cloudinary::getUrl($item->photo)}}"></td>
                                 <td>{{$item->title}}</td>
                                 <td>{{$item->created_at}}</td>
 <td>

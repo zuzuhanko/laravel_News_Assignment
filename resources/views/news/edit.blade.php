@@ -32,14 +32,15 @@
                 </select>
     </div>
 
-    <textarea id="summernote" name="detail" ></textarea>
+    <textarea id="summernote" name="detail" >{{$data->detail}}</textarea>
     <script>
+       $(document).ready(function() {
         $('#summernote').summernote({
-
-          placeholder: '{{$data->detail}}',
-          tabsize: 2,
-          height: 100
-        }).summernote('code','{{$data->detail}}');
+        placeholder: 'Hello Bootstrap 4',
+        tabsize: 2,
+        height: 100
+      }).html('');
+    });
       </script>
 
 
